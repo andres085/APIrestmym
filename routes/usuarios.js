@@ -3,7 +3,12 @@ const Usuario = require('../models/usuario_model');
 const ruta = express.Router();
 
 ruta.get('/', (req, res) => {
-    res.json('Listo el GET de usuarios.');
+    let resultado = listarUsuariosActivos();
+    resultado.then(usuarios => {
+        res.json(usuarios);
+    }).catch(err => {
+        res.status(400).json({error: err})
+    })
 });
 
 ruta.post('/', (req, res) => {
@@ -43,6 +48,7 @@ ruta.delete('/:id', (req, res) => {
     })
 });
 
+
 async function crearUsuario(body) {
     let usuario = new Usuario({
         email: body.email,
@@ -50,6 +56,11 @@ async function crearUsuario(body) {
         password: body.password
     });
     return await usuario.save();
+}
+
+async function listarUsuariosActivos() {
+    const usuarios = await Usuario.find({ "estado": true });
+    return usuarios;
 }
 
 async function actualizarUsuario(id, body) {
