@@ -30,6 +30,19 @@ ruta.put('/:id', (req, res) => {
     })
 });
 
+ruta.delete('/:id', (req, res) => {
+    let resultado = desactivarUsuario(req.params.id);
+    resultado.then(valor => {
+        res.json({
+            usuario: valor
+        })
+    }).catch(err => {
+        res.status(400).json({
+            error: err
+        })
+    })
+});
+
 async function crearUsuario(body) {
     let usuario = new Usuario({
         email: body.email,
@@ -47,6 +60,16 @@ async function actualizarUsuario(id, body) {
             email: body.email
         }
     }, {new: true})
+    console.log(usuario);
+    return usuario;
+}
+
+async function desactivarUsuario(id) {
+    const usuario = await Usuario.findByIdAndUpdate(id, {
+        $set: {
+            estado: false
+        }
+    }, { new: true })
     console.log(usuario);
     return usuario;
 }
