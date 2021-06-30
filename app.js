@@ -1,4 +1,5 @@
 const express = require('express');
+const usuarios = require('./routes/usuarios');
 const mongoose = require('mongoose');
 const app = express();
 
@@ -12,4 +13,8 @@ mongoose.connect('mongodb://localhost/mymbase', {useNewUrlParser: true, useUnifi
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log('API RESTful ok y ejecutandose...');
-})
+});
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/api/usuarios', usuarios);
