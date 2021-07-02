@@ -34,7 +34,10 @@ ruta.post('/', (req, res) => {
 
     resultado
         .then(user => {
-            res.json({ valor: user });
+            res.json({
+                nombre: user.nombre,
+                email: user.email
+            });
         })
         .catch(err => { res.status(400).json({ err }) })
     } else {
@@ -51,9 +54,10 @@ ruta.put('/:id', (req, res) => {
 
     if (!error) {
         let resultado = actualizarUsuario(req.params.id, req.body);
-        resultado.then(valor => {
+        resultado.then(usuario => {
             res.json({
-                valor: valor
+                nombre: usuario.nombre,
+                email: usuario.email
             })}).catch(err => {
                 res.status(400).json({
                     err
@@ -69,9 +73,10 @@ ruta.put('/:id', (req, res) => {
 
 ruta.delete('/:id', (req, res) => {
     let resultado = desactivarUsuario(req.params.id);
-    resultado.then(valor => {
+    resultado.then(usuario => {
         res.json({
-            usuario: valor
+            nombre: usuario.nombre,
+            email: usuario.email
         })
     }).catch(err => {
         res.status(400).json({
@@ -91,7 +96,8 @@ async function crearUsuario(body) {
 }
 
 async function listarUsuariosActivos() {
-    const usuarios = await Usuario.find({ "estado": true });
+    const usuarios = await Usuario.find({ "estado": true })
+    .select({ nombre: 1, email: 1 });
     return usuarios;
 }
 
