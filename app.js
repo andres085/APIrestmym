@@ -1,5 +1,6 @@
 const express = require('express');
 const usuarios = require('./routes/usuarios');
+const cursos = require('./routes/cursos');
 const mongoose = require('mongoose');
 const app = express();
 
@@ -18,3 +19,5 @@ app.listen(port, () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/usuarios', usuarios);
+app.use('/api/cursos', cursos);
+
