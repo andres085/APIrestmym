@@ -120,7 +120,7 @@ async function actualizarUsuario(id, body) {
     const usuario = await Usuario.findByIdAndUpdate(id, {
         $set: {
             nombre: body.nombre,
-            password: body.password,
+            password: bcrypt.hashSync(body.password,10),
             email: body.email
         }
     }, {new: true})
