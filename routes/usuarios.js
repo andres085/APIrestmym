@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
 const ruta = express.Router();
@@ -104,7 +105,7 @@ async function crearUsuario(body) {
     let usuario = new Usuario({
         email: body.email,
         nombre: body.nombre,
-        password: body.password
+        password: bcrypt.hashSync(body.password, 10)
     });
     return await usuario.save();
 }
