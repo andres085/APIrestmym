@@ -28,6 +28,19 @@ ruta.get('/', (req, res) => {
 ruta.post('/', (req, res) => {
     let body = req.body;
 
+    //Revisar porque hay que mejorar esto
+     Usuario.findOne({email: body.email}, (err, user) => {
+        if(err){
+            return res.status(400).json({error:'Server error'});
+        }
+        if(user){
+            //Usuario si existe
+            return res.status(400).json({
+                msj:'El email ya esta registrado'
+            });
+        }
+    });
+       
     const { error, value } = schema.validate({ nombre: body.nombre, email: body.email });
     if (!error) {
         let resultado = crearUsuario(body);
@@ -87,6 +100,7 @@ ruta.delete('/:id', (req, res) => {
 
 
 async function crearUsuario(body) {
+
     let usuario = new Usuario({
         email: body.email,
         nombre: body.nombre,
