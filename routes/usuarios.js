@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
+const verificarToken = require('../middlewares/auth');
 const ruta = express.Router();
 
 const schema = Joi.object({
@@ -15,9 +16,9 @@ const schema = Joi.object({
 
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
-})
+});
 
-ruta.get('/', (req, res) => {
+ruta.get('/', verificarToken, (req, res) => {
     let resultado = listarUsuariosActivos();
     resultado.then(usuarios => {
         res.json(usuarios);
@@ -29,18 +30,14 @@ ruta.get('/', (req, res) => {
 ruta.post('/', (req, res) => {
     let body = req.body;
 
-    //Revisar porque hay que mejorar esto
-     Usuario.findOne({email: body.email}, (err, user) => {
-        if(err){
-            return res.status(400).json({error:'Server error'});
-        }
-        if(user){
-            //Usuario si existe
-            return res.status(400).json({
-                msj:'El email ya esta registrado'
-            });
-        }
-    });
+    //Revisar esto
+    Usuario.findOne({ email: req.body.email })
+        .then(datos => {
+            if (datos) {
+                res.status(400).send({ msj: 'El email ya existe' })
+                return;
+            }
+        });
        
     const { error, value } = schema.validate({ nombre: body.nombre, email: body.email });
     if (!error) {
@@ -48,21 +45,21 @@ ruta.post('/', (req, res) => {
 
     resultado
         .then(user => {
-            res.json({
+            return res.json({
                 nombre: user.nombre,
                 email: user.email
             });
         })
-        .catch(err => { res.status(400).json({ err }) })
+        .catch(err => { return res.status(400).json({ err }) })
     } else {
-        res.status(400).json({
+        return res.status(400).json({
             error
         })
     }
     
 });
 
-ruta.put('/:id', (req, res) => {
+ruta.put('/:id', verificarToken, (req, res) => {
 
     const { error, value } = schema.validate({ nombre: req.body.nombre, email: req.body.email, password: req.body.password });
 
@@ -85,7 +82,7 @@ ruta.put('/:id', (req, res) => {
    
 });
 
-ruta.delete('/:id', (req, res) => {
+ruta.delete('/:id', verificarToken, (req, res) => {
     let resultado = desactivarUsuario(req.params.id);
     resultado.then(usuario => {
         res.json({
@@ -108,6 +105,10 @@ async function crearUsuario(body) {
         password: bcrypt.hashSync(body.password, 10)
     });
     return await usuario.save();
+}
+
+async function validarUsuario(email) {
+    
 }
 
 async function listarUsuariosActivos() {
