@@ -1,0 +1,10 @@
+{
+    "nombre": "API rest Express cursos M&M",
+    "configDB": {
+        "HOST" : "mongodb://localhost/mymbase"
+    },
+    "configToken":{
+        "SEED": "secret",
+        "expiration" : "24h"
+    }
+}

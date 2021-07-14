@@ -4,9 +4,10 @@ const cursos = require('./routes/cursos');
 const auth = require('./routes/auth');
 const mongoose = require('mongoose');
 const app = express();
+const config = require('config');
 
 //Conectar a la BD
-mongoose.connect('mongodb://localhost/mymbase', {useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect(config.get('configDB.HOST'), {useNewUrlParser: true, useUnifiedTopology: true})
 .then(() => {
     console.log('Conectado a MongoDB');
 })
