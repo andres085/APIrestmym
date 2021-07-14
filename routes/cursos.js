@@ -1,5 +1,6 @@
 const express = require('express');
 const Curso = require('../models/curso_model');
+const verificarToken = require('../middlewares/auth');
 const Joi = require('joi');
 const ruta = express.Router();
 
@@ -15,7 +16,7 @@ const schema = Joi.object({
         .required(),
 })
 
-ruta.get('/', (req, res) => {
+ruta.get('/', verificarToken, (req, res) => {
     let resultado = listarCursosActivos();
     resultado.then(cursos => {
         res.json(cursos);

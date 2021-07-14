@@ -1,9 +1,8 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const config = require('config');
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/usuario_model');
 const Joi = require('joi');
+const verificarToken = require('../middlewares/auth');
 const ruta = express.Router();
 
 const schema = Joi.object({
@@ -18,19 +17,6 @@ const schema = Joi.object({
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
 });
-
-let verificarToken = (req, res, next) => {
-    let token = req.get('Authorization');
-    jwt.verify(token, config.get('configToken.SEED'), (err, decode) => {
-        if (err) {
-            return res.status(401).json({
-                err
-            })
-        }
-        req.usuario = decode.usuario;
-        next();
-    })
-}
 
 ruta.get('/', verificarToken, (req, res) => {
     let resultado = listarUsuariosActivos();
