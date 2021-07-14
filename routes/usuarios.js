@@ -29,18 +29,14 @@ ruta.get('/', (req, res) => {
 ruta.post('/', (req, res) => {
     let body = req.body;
 
-    //Revisar porque hay que mejorar esto
-     Usuario.findOne({email: body.email}, (err, user) => {
-        if(err){
-            return res.status(400).json({error:'Server error'});
-        }
-        if(user){
-            //Usuario si existe
-            return res.status(400).json({
-                msj:'El email ya esta registrado'
-            });
-        }
-    });
+    //Revisar esto
+    Usuario.findOne({ email: req.body.email })
+        .then(datos => {
+            if (datos) {
+                res.status(400).send({ msj: 'El email ya existe' })
+                return;
+            }
+        });
        
     const { error, value } = schema.validate({ nombre: body.nombre, email: body.email });
     if (!error) {
@@ -48,14 +44,14 @@ ruta.post('/', (req, res) => {
 
     resultado
         .then(user => {
-            res.json({
+            return res.json({
                 nombre: user.nombre,
                 email: user.email
             });
         })
-        .catch(err => { res.status(400).json({ err }) })
+        .catch(err => { return res.status(400).json({ err }) })
     } else {
-        res.status(400).json({
+        return res.status(400).json({
             error
         })
     }
@@ -108,6 +104,10 @@ async function crearUsuario(body) {
         password: bcrypt.hashSync(body.password, 10)
     });
     return await usuario.save();
+}
+
+async function validarUsuario(email) {
+    
 }
 
 async function listarUsuariosActivos() {
