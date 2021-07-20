@@ -11,7 +11,8 @@ mongoose.connect(config.get('configDB.HOST'), {useNewUrlParser: true, useUnified
 .then(() => {
     console.log('Conectado a MongoDB');
 })
-.catch(() => {console.log('No se pudo conectar con MongoDB', err)})
+    .catch(() => { console.log('No se pudo conectar con MongoDB', err) })
+mongoose.set('useCreateIndex', true);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

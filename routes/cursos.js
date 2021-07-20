@@ -17,6 +17,7 @@ const schema = Joi.object({
 })
 
 ruta.get('/', verificarToken, (req, res) => {
+
     let resultado = listarCursosActivos();
     resultado.then(cursos => {
         res.json(cursos);
@@ -26,12 +27,11 @@ ruta.get('/', verificarToken, (req, res) => {
 });
 
 ruta.post('/', verificarToken, (req, res) => {
-    let body = req.body;
 
-    const { error, value } = schema.validate({ titulo: body.titulo, descripcion: body.descripcion });
+    const { error, value } = schema.validate({ titulo: req.body.titulo, descripcion: req.body.descripcion });
 
     if (!error) {
-        let resultado = crearCurso(body);
+        let resultado = crearCurso(req);
 
         resultado
             .then(curso => {
@@ -92,16 +92,17 @@ ruta.delete('/:id', verificarToken, (req, res) => {
 });
 
 
-async function crearCurso(body) {
+async function crearCurso(req) {
     let curso = new Curso({
-        titulo: body.titulo,
-        descripcion: body.descripcion,
+        titulo: req.body.titulo,
+        descripcion: req.body.descripcion,
+        autor: req.usuario._id,
     });
     return await curso.save();
 }
 
 async function listarCursosActivos() {
-    const cursos = await Curso.find({ "estado": true });
+    const cursos = await Curso.find({ "estado": true }).populate('autor', 'nombre -_id',);
     return cursos;
 }
 
